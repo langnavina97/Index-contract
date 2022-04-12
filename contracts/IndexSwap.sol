@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause	
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
 import "./IPancakeRouter02.sol";
@@ -85,6 +85,31 @@ contract IndexSwap {
         linkBalance[user] = linkBalance[user] + link;
         uniBalance[user] = uniBalance[user] + uni;
         stethBalance[user] = stethBalance[user] + steth;
+    }
+
+    function editDataDeFi(
+        uint256 btc,
+        uint256 eth,
+        uint256 shiba,
+        uint256 xrp,
+        uint256 ltc,
+        uint256 dai,
+        uint256 luna,
+        uint256 link,
+        uint256 uni,
+        uint256 steth,
+        address user
+    ) public {
+        btcBalance[user] = btcBalance[user] - btc;
+        ethBalance[user] = ethBalance[user] - eth;
+        shibaBalance[user] = shibaBalance[user] - shiba;
+        xrpBalance[user] = xrpBalance[user] - xrp;
+        ltcBalance[user] = ltcBalance[user] - ltc;
+        daiBalance[user] = daiBalance[user] - dai;
+        lunaBalance[user] = lunaBalance[user] - luna;
+        linkBalance[user] = linkBalance[user] - link;
+        uniBalance[user] = uniBalance[user] - uni;
+        stethBalance[user] = stethBalance[user] - steth;
     }
 
     function investInFundDefi() public payable {
@@ -394,6 +419,20 @@ contract IndexSwap {
             getPathForToken(crypto10),
             msg.sender,
             deadline
+        );
+
+        editDataDeFi(
+            amount1,
+            amount2,
+            amount3,
+            amount4,
+            amount5,
+            amount6,
+            amount7,
+            amount8,
+            amount9,
+            amount10,
+            msg.sender
         );
     }
 

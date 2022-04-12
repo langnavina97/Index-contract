@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause	
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
 import "./IPancakeRouter02.sol";
@@ -84,6 +84,31 @@ contract NFTPortfolio {
         chzBalance[user] = chzBalance[user] + chz;
         enjBalance[user] = enjBalance[user] + enj;
         roseBalance[user] = roseBalance[user] + rose;
+    }
+
+    function editDataNFT(
+        uint256 axs,
+        uint256 mana,
+        uint256 sand,
+        uint256 theta,
+        uint256 flow,
+        uint256 xtz,
+        uint256 gala,
+        uint256 chz,
+        uint256 enj,
+        uint256 rose,
+        address user
+    ) public {
+        axsBalance[user] = axsBalance[user] - axs;
+        manaBalance[user] = manaBalance[user] - mana;
+        sandBalance[user] = sandBalance[user] - sand;
+        thetaBalance[user] = thetaBalance[user] - theta;
+        flowalance[user] = flowalance[user] - flow;
+        xtzBalance[user] = xtzBalance[user] - xtz;
+        galaBalance[user] = galaBalance[user] - gala;
+        chzBalance[user] = chzBalance[user] - chz;
+        enjBalance[user] = enjBalance[user] - enj;
+        roseBalance[user] = roseBalance[user] - rose;
     }
 
     function investInFundDefi() public payable {
@@ -392,6 +417,20 @@ contract NFTPortfolio {
             getPathForToken(crypto20),
             msg.sender,
             deadline
+        );
+
+        editDataNFT(
+            amount1,
+            amount2,
+            amount3,
+            amount4,
+            amount5,
+            amount6,
+            amount7,
+            amount8,
+            amount9,
+            amount10,
+            msg.sender
         );
     }
 
