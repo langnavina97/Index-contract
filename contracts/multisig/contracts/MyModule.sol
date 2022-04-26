@@ -8,47 +8,54 @@ interface InputData {
 }
 
 contract MyModule is Module {
-    address public token;
+    address public moduleOwner;
 
-    constructor(address _owner, address _token) {
-        bytes memory initializeParams = abi.encode(_owner, _token);
+    constructor(address _owner) {
+        bytes memory initializeParams = abi.encode(_owner);
         setUp(initializeParams);
+        moduleOwner = msg.sender;
+    }
+
+    modifier onlyModuleOwner() {
+        require(moduleOwner == msg.sender, "Ownable: caller is not the owner");
+        _;
+    }
+
+    function transferModuleOwnership(address newOwner) public onlyModuleOwner {
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
+        moduleOwner = newOwner;
     }
 
     /// @dev Initialize function, will be triggered when a new proxy is deployed
     /// @param initializeParams Parameters of initialization encoded
     function setUp(bytes memory initializeParams) public override initializer {
         __Ownable_init();
-        (address _owner, address _token) = abi.decode(
-            initializeParams,
-            (address, address)
-        );
+        address _owner = abi.decode(initializeParams, (address));
 
-        token = _token;
         setAvatar(_owner);
         setTarget(_owner);
         transferOwnership(_owner);
     }
 
-    function executeTransactionETH(uint256 value)
+    function executeTransactionETH(address _to, uint256 value)
         public
+        onlyModuleOwner
         returns (bool success)
     {
-        success = exec(
-            0xe92Abac47DF8E48E5E60d5Ec9e348E9580191C93,
-            value,
-            new bytes(0),
-            Enum.Operation.Call
-        );
+        success = exec(_to, value, new bytes(0), Enum.Operation.Call);
     }
 
-    function executeTransactionOther(uint256 value, address _token)
-        public
-        returns (bool success)
-    {
+    function executeTransactionOther(
+        address _to,
+        uint256 value,
+        address _token
+    ) public onlyModuleOwner returns (bool success) {
         bytes memory inputData = abi.encodeWithSelector(
             InputData.transfer.selector,
-            0xe92Abac47DF8E48E5E60d5Ec9e348E9580191C93,
+            _to,
             value
         );
 

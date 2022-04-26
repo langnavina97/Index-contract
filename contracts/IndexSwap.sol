@@ -7,30 +7,33 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./IToken.sol";
 import "@uniswap/lib/contracts/libraries/TransferHelper.sol";
+import "./multisig/contracts/MyModule.sol";
 
 contract IndexSwap {
     address internal constant pancakeSwapAddress =
-        0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3; //Router for pancake bsc testnet
-    // address internal constant pancakeSwapAddress = 0x10ED43C718714eb63d5aA57B78B54704E256024E; //Router for bsc mainnet
+        0x10ED43C718714eb63d5aA57B78B54704E256024E; //Router for pancake bsc mainnet
+
     IPancakeRouter02 public pancakeSwapRouter;
 
-    address private vault = 0x6056773C28c258425Cf9BC8Ba5f86B8031863164;
+    // TODO: change when redeploy with ownership
+    // transfer ownership of module to this contract
+    MyModule gnosisSafe = MyModule(0xE86AA29846a16DF13f6599C6d5d9d314011EBd55);
+    address private vault = 0xD2aDa2CC6f97cfc1045B1cF70b3149139aC5f2a2;
+
+    address private crypto1 = 0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c; // BTC
+    address private crypto2 = 0x2170Ed0880ac9A755fd29B2688956BD959F933F8; // ETH
+    address private crypto3 = 0x2859e4544C4bB03966803b044A93563Bd2D0DD4D; // SHIBA
+    address private crypto4 = 0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE; // XRP
+    address private crypto5 = 0x4338665CBB7B2485A8855A139b75D5e34AB0DB94; // LTC
+    address private crypto6 = 0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3; // DAI
+    address private crypto7 = 0x5f0Da599BB2ccCfcf6Fdfd7D81743B6020864350; // Maker
+    address private crypto8 = 0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD; // LINK
+    address private crypto9 = 0xBf5140A22578168FD562DCcF235E5D43A02ce9B1; // UNI
+    address private crypto10 = 0xfb6115445Bff7b52FeB98650C87f44907E58f802; // AAVE
 
     IToken public defiToken;
 
     using SafeMath for uint256;
-
-    //address private crypto1 = 0x419816F160C9bf1Bb8F297d17E1bF44207B9E06C; // BTC
-    address private crypto1 = 0x4b1851167f74FF108A994872A160f1D6772d474b; // BTC
-    address private crypto2 = 0x8BaBbB98678facC7342735486C851ABD7A0d17Ca; // ETH -- already existed
-    address private crypto3 = 0xBf0646Fa5ABbFf6Af50a9C40D5E621835219d384; // SHIBA
-    address private crypto4 = 0xCc00177908830cE1644AEB4aD507Fda3789128Af; // XRP
-    address private crypto5 = 0x2F9fd65E3BB89b68a8e2Abd68Db25F5C348F68Ee; // LTC
-    address private crypto6 = 0x8a9424745056Eb399FD19a0EC26A14316684e274; // DAI -- already existed
-    address private crypto7 = 0x0bBF12a9Ccd7cD0E23dA21eFd3bb16ba807ab069; // LUNA
-    address private crypto8 = 0x8D908A42FD847c80Eeb4498dE43469882436c8FF; // LINK
-    address private crypto9 = 0x62955C6cA8Cd74F8773927B880966B7e70aD4567; // UNI
-    address private crypto10 = 0xb7a58582Df45DBa8Ad346c6A51fdb796D64e0898; // STETH
 
     mapping(address => uint256) public btcBalance;
     mapping(address => uint256) public ethBalance;
@@ -38,10 +41,10 @@ contract IndexSwap {
     mapping(address => uint256) public xrpBalance;
     mapping(address => uint256) public ltcBalance;
     mapping(address => uint256) public daiBalance;
-    mapping(address => uint256) public lunaBalance;
+    mapping(address => uint256) public makerBalance;
     mapping(address => uint256) public linkBalance;
     mapping(address => uint256) public uniBalance;
-    mapping(address => uint256) public stethBalance;
+    mapping(address => uint256) public aaveBalance;
 
     struct rate {
         uint256 numerator;
@@ -52,7 +55,7 @@ contract IndexSwap {
 
     constructor() {
         pancakeSwapRouter = IPancakeRouter02(pancakeSwapAddress);
-        defiToken = IToken(0xF70538622598232a95B1EC1914Fc878d28EBAE68);
+        defiToken = IToken(0x6E49456f284e3da7f1515eEE120E2706cab69fD5);
     }
 
     function updateRate(uint256 _numerator, uint256 _denominator) public {
@@ -69,10 +72,10 @@ contract IndexSwap {
         uint256 xrp,
         uint256 ltc,
         uint256 dai,
-        uint256 luna,
+        uint256 maker,
         uint256 link,
         uint256 uni,
-        uint256 steth,
+        uint256 aave,
         address user
     ) public {
         btcBalance[user] = btcBalance[user] + btc;
@@ -81,10 +84,10 @@ contract IndexSwap {
         xrpBalance[user] = xrpBalance[user] + xrp;
         ltcBalance[user] = ltcBalance[user] + ltc;
         daiBalance[user] = daiBalance[user] + dai;
-        lunaBalance[user] = lunaBalance[user] + luna;
+        makerBalance[user] = makerBalance[user] + maker;
         linkBalance[user] = linkBalance[user] + link;
         uniBalance[user] = uniBalance[user] + uni;
-        stethBalance[user] = stethBalance[user] + steth;
+        aaveBalance[user] = aaveBalance[user] + aave;
     }
 
     function editDataDeFi(
@@ -94,10 +97,10 @@ contract IndexSwap {
         uint256 xrp,
         uint256 ltc,
         uint256 dai,
-        uint256 luna,
+        uint256 maker,
         uint256 link,
         uint256 uni,
-        uint256 steth,
+        uint256 aave,
         address user
     ) public {
         btcBalance[user] = btcBalance[user] - btc;
@@ -106,10 +109,10 @@ contract IndexSwap {
         xrpBalance[user] = xrpBalance[user] - xrp;
         ltcBalance[user] = ltcBalance[user] - ltc;
         daiBalance[user] = daiBalance[user] - dai;
-        lunaBalance[user] = lunaBalance[user] - luna;
+        makerBalance[user] = makerBalance[user] - maker;
         linkBalance[user] = linkBalance[user] - link;
         uniBalance[user] = uniBalance[user] - uni;
-        stethBalance[user] = stethBalance[user] - steth;
+        aaveBalance[user] = aaveBalance[user] - aave;
     }
 
     function investInFundDefi() public payable {
@@ -202,10 +205,10 @@ contract IndexSwap {
         uint256 amount4 = xrpBalance[msg.sender];
         uint256 amount5 = ltcBalance[msg.sender];
         uint256 amount6 = daiBalance[msg.sender];
-        uint256 amount7 = lunaBalance[msg.sender];
+        uint256 amount7 = makerBalance[msg.sender];
         uint256 amount8 = linkBalance[msg.sender];
         uint256 amount9 = uniBalance[msg.sender];
-        uint256 amount10 = stethBalance[msg.sender];
+        uint256 amount10 = aaveBalance[msg.sender];
 
         // IDT Token Burn
         TransferHelper.safeTransferFrom(
@@ -224,120 +227,80 @@ contract IndexSwap {
         // -------------------------------------------------------------------------------------------- //
 
         //Getting Investment Back From Vault to Contract
-        TransferHelper.safeTransferFrom(
-            address(crypto1),
-            vault,
-            address(this),
-            amount1
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount1, crypto1);
+
         TransferHelper.safeApprove(
             address(crypto1),
             address(pancakeSwapRouter),
             amount1
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto2),
-            vault,
-            address(this),
-            amount2
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount2, crypto2);
+
         TransferHelper.safeApprove(
             address(crypto2),
             address(pancakeSwapRouter),
             amount2
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto3),
-            vault,
-            address(this),
-            amount3
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount3, crypto3);
+
         TransferHelper.safeApprove(
             address(crypto3),
             address(pancakeSwapRouter),
             amount3
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto4),
-            vault,
-            address(this),
-            amount4
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount4, crypto4);
+
         TransferHelper.safeApprove(
             address(crypto4),
             address(pancakeSwapRouter),
             amount4
         );
 
-        TransferHelper.safeTransferFrom(
+        gnosisSafe.executeTransactionOther(address(this), amount5, crypto5);
+
+        TransferHelper.safeApprove(
             address(crypto5),
-            vault,
-            address(this),
+            address(pancakeSwapRouter),
             amount5
         );
-        TransferHelper.safeApprove(
-            address(crypto5),
-            address(pancakeSwapRouter),
-            amount6
-        );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto6),
-            vault,
-            address(this),
-            amount6
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount6, crypto6);
+
         TransferHelper.safeApprove(
             address(crypto6),
             address(pancakeSwapRouter),
             amount6
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto7),
-            vault,
-            address(this),
-            amount7
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount7, crypto7);
+
         TransferHelper.safeApprove(
             address(crypto7),
             address(pancakeSwapRouter),
             amount7
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto8),
-            vault,
-            address(this),
-            amount8
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount8, crypto8);
+
         TransferHelper.safeApprove(
             address(crypto8),
             address(pancakeSwapRouter),
             amount8
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto9),
-            vault,
-            address(this),
-            amount9
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount9, crypto9);
+
         TransferHelper.safeApprove(
             address(crypto9),
             address(pancakeSwapRouter),
             amount9
         );
 
-        TransferHelper.safeTransferFrom(
-            address(crypto10),
-            vault,
-            address(this),
-            amount10
-        );
+        gnosisSafe.executeTransactionOther(address(this), amount10, crypto10);
+
         TransferHelper.safeApprove(
             address(crypto10),
             address(pancakeSwapRouter),
@@ -436,11 +399,6 @@ contract IndexSwap {
         );
     }
 
-    // function addLiquidity() public payable{
-    //   uint deadline = block.timestamp + 15;
-    //   token.approve(pancakeSwapAddress,1000000000000000000000000000);
-    //   // pancakeSwapRouter.addLiquidityEth{value: msg.value}();
-    // }
     function getPathForETH(address crypto)
         public
         view

@@ -1,0 +1,24 @@
+{
+  "name": "index-contract",
+  "version": "1.0.0",
+  "description": "Index contract for BSC",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/langnavina97/Index-contract.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/langnavina97/Index-contract/issues"
+  },
+  "homepage": "https://github.com/langnavina97/Index-contract#readme",
+  "dependencies": {
+    "@gnosis.pm/zodiac": "^1.0.7",
+    "@openzeppelin/contracts": "^4.5.0",
+    "@uniswap/lib": "^4.0.1-alpha"
+  }
+}
