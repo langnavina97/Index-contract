@@ -1,0 +1,14 @@
+{
+  "name": "06_gnosis_safe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@gnosis.pm/zodiac": "^1.0.7"
+  }
+}
