@@ -181,11 +181,21 @@ contract IndexSwap {
 
         crpyto1Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
-        }(0, getPathForETH(crypto1), vault, deadline);
+        }(0, getPathForETH(crypto1), address(this), deadline);
+
+        // Venus BTC
+        underlyingBTC.approve(address(vBTCToken), amount1);
+        assert(vBTCToken.mint(amount1) == 0);
+        vBTCToken.transfer(vault, amount1);
 
         crpyto2Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
-        }(0, getPathForETH(crypto2), vault, deadline);
+        }(0, getPathForETH(crypto2), address(this), deadline);
+
+        // Venus ETH
+        underlyingETH.approve(address(vETHToken), amount2);
+        assert(vETHToken.mint(amount2) == 0);
+        vETHToken.transfer(vault, amount2);
 
         crpyto3Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
@@ -193,15 +203,30 @@ contract IndexSwap {
 
         crpyto4Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
-        }(0, getPathForETH(crypto4), vault, deadline);
+        }(0, getPathForETH(crypto4), address(this), deadline);
+
+        // Venus XRP
+        underlyingXRP.approve(address(vXRPToken), amount5);
+        assert(vXRPToken.mint(amount5) == 0);
+        vXRPToken.transfer(vault, amount5);
 
         crpyto5Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
-        }(0, getPathForETH(crypto5), vault, deadline);
+        }(0, getPathForETH(crypto5), address(this), deadline);
+
+        // Venus LTC
+        underlyingLTC.approve(address(vLTCToken), amount3);
+        assert(vLTCToken.mint(amount3) == 0);
+        vLTCToken.transfer(vault, amount3);
 
         crpyto6Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
-        }(0, getPathForETH(crypto6), vault, deadline);
+        }(0, getPathForETH(crypto6), address(this), deadline);
+
+        // Venus DAI
+        underlyingDAI.approve(address(vDAIToken), amount4);
+        assert(vDAIToken.mint(amount4) == 0);
+        vDAIToken.transfer(vault, amount4);
 
         crpyto7Amount = pancakeSwapRouter.swapExactETHForTokens{
             value: msg.value / 10
@@ -271,18 +296,30 @@ contract IndexSwap {
         // -------------------------------------------------------------------------------------------- //
 
         //Getting Investment Back From Vault to Contract
-        gnosisSafe.executeTransactionOther(address(this), amount1, crypto1);
-
+        // send vToken back to contract BTC
+        gnosisSafe.executeTransactionOther(
+            address(this),
+            amount1,
+            address(vBTCToken)
+        );
+        // get back underlying token BTC
+        assert(vBTCToken.redeemUnderlying(amount1) == 0);
         TransferHelper.safeApprove(
-            address(crypto1),
+            address(underlyingBTC),
             address(pancakeSwapRouter),
             amount1
         );
 
-        gnosisSafe.executeTransactionOther(address(this), amount2, crypto2);
-
+        // send vToken back to contract ETH
+        gnosisSafe.executeTransactionOther(
+            address(this),
+            amount2,
+            address(vETHToken)
+        );
+        // get back underlying token ETH
+        assert(vETHToken.redeemUnderlying(amount2) == 0);
         TransferHelper.safeApprove(
-            address(crypto2),
+            address(underlyingETH),
             address(pancakeSwapRouter),
             amount2
         );
@@ -295,26 +332,44 @@ contract IndexSwap {
             amount3
         );
 
-        gnosisSafe.executeTransactionOther(address(this), amount4, crypto4);
-
+        // send vToken back to contract XRP
+        gnosisSafe.executeTransactionOther(
+            address(this),
+            amount4,
+            address(vXRPToken)
+        );
+        // get back underlying token XRP
+        assert(vXRPToken.redeemUnderlying(amount4) == 0);
         TransferHelper.safeApprove(
-            address(crypto4),
+            address(underlyingXRP),
             address(pancakeSwapRouter),
             amount4
         );
 
-        gnosisSafe.executeTransactionOther(address(this), amount5, crypto5);
-
+        // send vToken back to contract LTC
+        gnosisSafe.executeTransactionOther(
+            address(this),
+            amount5,
+            address(vLTCToken)
+        );
+        // get back underlying token LTC
+        assert(vLTCToken.redeemUnderlying(amount5) == 0);
         TransferHelper.safeApprove(
-            address(crypto5),
+            address(underlyingLTC),
             address(pancakeSwapRouter),
             amount5
         );
 
-        gnosisSafe.executeTransactionOther(address(this), amount6, crypto6);
+        // send vToken back to contract DAI
+        gnosisSafe.executeTransactionOther(
+            address(this),
+            amount6,
+            address(vDAIToken)
+        );
 
+        assert(vDAIToken.redeemUnderlying(amount6) == 0);
         TransferHelper.safeApprove(
-            address(crypto6),
+            address(underlyingDAI),
             address(pancakeSwapRouter),
             amount6
         );
@@ -441,133 +496,6 @@ contract IndexSwap {
             amount10,
             msg.sender
         );
-    }
-
-    // VENUS PROTOCOL
-    function lendTokens(
-        uint256 amount1,
-        uint256 amount2,
-        uint256 amount3,
-        uint256 amount4,
-        uint256 amount5
-    ) public {
-        // BTC
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount1,
-            0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c
-        );
-
-        underlyingBTC.approve(address(vBTCToken), amount1);
-        assert(vBTCToken.mint(amount1) == 0);
-
-        vBTCToken.transfer(vault, amount1);
-
-        // ETH
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount2,
-            0x2170Ed0880ac9A755fd29B2688956BD959F933F8
-        );
-
-        underlyingETH.approve(address(vETHToken), amount2);
-        assert(vETHToken.mint(amount2) == 0);
-
-        vETHToken.transfer(vault, amount2);
-
-        // LTC
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount3,
-            0x4338665CBB7B2485A8855A139b75D5e34AB0DB94
-        );
-
-        underlyingLTC.approve(address(vLTCToken), amount3);
-        assert(vLTCToken.mint(amount3) == 0);
-
-        vLTCToken.transfer(vault, amount3);
-
-        // DAI
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount4,
-            0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3
-        );
-
-        underlyingDAI.approve(address(vDAIToken), amount4);
-        assert(vDAIToken.mint(amount4) == 0);
-
-        vDAIToken.transfer(vault, amount4);
-
-        // XRP
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount5,
-            0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE
-        );
-
-        underlyingXRP.approve(address(vXRPToken), amount5);
-        assert(vXRPToken.mint(amount5) == 0);
-
-        vXRPToken.transfer(vault, amount5);
-    }
-
-    function redeemTokens(
-        uint256 amount1,
-        uint256 amount2,
-        uint256 amount3,
-        uint256 amount4,
-        uint256 amount5
-    ) public {
-        // BTC
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount1,
-            address(vBTCToken)
-        );
-
-        assert(vBTCToken.redeemUnderlying(amount1) == 0);
-        underlyingBTC.transfer(vault, amount1);
-
-        // ETH
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount2,
-            address(vETHToken)
-        );
-
-        assert(vETHToken.redeemUnderlying(amount2) == 0);
-        underlyingETH.transfer(vault, amount2);
-
-        // LTC
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount3,
-            address(vLTCToken)
-        );
-
-        assert(vLTCToken.redeemUnderlying(amount3) == 0);
-        underlyingLTC.transfer(vault, amount3);
-
-        // DAI
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount4,
-            address(vDAIToken)
-        );
-
-        assert(vDAIToken.redeemUnderlying(amount4) == 0);
-        underlyingDAI.transfer(vault, amount4);
-
-        // XRP
-        gnosisSafe.executeTransactionOther(
-            address(this),
-            amount5,
-            address(vXRPToken)
-        );
-
-        assert(vXRPToken.redeemUnderlying(amount5) == 0);
-        underlyingXRP.transfer(vault, amount5);
     }
 
     function getPathForETH(address crypto)
