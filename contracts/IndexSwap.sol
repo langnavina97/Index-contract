@@ -10,16 +10,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-pragma solidity <=0.8.10;
-
-import "https://github.com/pancakeswap/pancake-swap-periphery/blob/master/contracts/interfaces/IPancakeRouter02.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
-//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
-import "@uniswap/lib/contracts/libraries/TransferHelper.sol";
-import "@openzeppelin/contracts@4.5.0/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts@4.5.0/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts@4.5.0/access/Ownable.sol";
-
 // // SPDX-License-Identifier: MIT
 // pragma solidity <=0.7.6;
 
